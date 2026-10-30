@@ -1,0 +1,513 @@
+/* 舞台样式：一切以「能干净地叠进 OBS 场景」为准 —— 透明、无滚动条、不吃鼠标 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  /* OBS 里不需要选中文字，也避免拖拽选中把画面弄花 */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/* 特效层压在模型之上：撒花、爱心、喷水都要盖住她才有冲击力 */
+#fx {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+}
+
+#fx-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 左下角弹幕流水。真实直播间里观众会自己看平台弹幕，这一层是可选的（?feed=0 关掉） */
+#feed {
+  position: fixed;
+  left: 28px;
+  bottom: 120px;
+  width: min(38vw, 600px);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 5px;
+  z-index: 60;
+  pointer-events: none;
+  font-size: 19px;
+  line-height: 1.32;
+}
+
+#feed .line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  color: #1b2a44;
+  text-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.85);
+  opacity: 0;
+  transform: translateX(-12px);
+  animation: feed-in 0.35s ease-out forwards;
+  transition: opacity 0.6s ease;
+}
+
+#feed .line .who {
+  color: #2f6fb8;
+  font-weight: 700;
+  flex: none;
+  max-width: 38%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#feed .line .what {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes feed-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 大额打赏横幅 */
+#banner {
+  position: fixed;
+  top: 6vh;
+  left: 4vw;
+  transform: translateY(-16px);
+  z-index: 95;
+  padding: 13px 30px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 108, 172, 0.94), rgba(124, 92, 255, 0.94));
+  color: #fff;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 40px rgba(124, 92, 255, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#banner.show {
+  animation: banner-pop 2.8s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes banner-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.88);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0) scale(1.03);
+  }
+  20% {
+    transform: translateY(0) scale(1);
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+/* 兜底字幕：万一 pet.js 的 act() 没挂上，至少话还能说出来 */
+#fallback-sub {
+  position: fixed;
+  left: 50%;
+  bottom: 9vh;
+  transform: translateX(-50%);
+  z-index: 70;
+  max-width: 64vw;
+  padding: 14px 26px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(120, 180, 235, 0.5);
+  color: #1b2a44;
+  box-shadow: 0 6px 20px rgba(120, 160, 210, 0.2);
+  font-size: 28px;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+#fallback-sub.show {
+  opacity: 1;
+}
+
+#hint {
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+  z-index: 50;
+  font-size: 14px;
+  color: rgba(27, 42, 68, 0.45);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+#hint.hide {
+  opacity: 0;
+}
+
+/* pet.js 自己的菜单/输入框/按钮在直播场景里是干扰，全部藏掉（气泡和模型保留） */
+.dshp-menu,
+.dshp-composer,
+.dshp-hud,
+.dshp-tab-btn,
+.dshp-btn,
+.dshp-report,
+.dshp-dock {
+  display: none !important;
+}
+
+/* pet.js 把气泡定位在画布正上方（桌宠 180px 高时正好）。舞台里模型有一屏高，
+   照原样会被顶出画面，所以改成贴在她头顶附近，并把字号夹在一个适合 1080p 的范围。
+   用 #dsh-live2d-pet 前缀是为了压过 pet.js 注入的 .dshp-bubble 规则。 */
+#dsh-live2d-pet .dshp-bubble {
+  bottom: auto !important;
+  top: 2% !important;
+  /* 气泡和模型画布是兄弟节点，默认按 DOM 顺序画，画布在后就会盖住它。
+     桌宠形态下气泡在画布上方所以从来没撞过，舞台里必须自己提层。 */
+  z-index: 20 !important;
+  max-width: min(46vw, 620px) !important;
+  padding: 14px 22px !important;
+  border-radius: 20px !important;
+  font-size: clamp(18px, 1.9vw, 30px) !important;
+  line-height: 1.45 !important;
+}
+
+/* 气泡抬头：pet.js 每次显示都会把名字重写成写死的「DS 鲸鱼娘」（源码里有 17 处），
+   改 DOM 会被它盖回去，所以直接用 CSS 把文字压成 0 宽、再用 ::after 写出我们的名字。
+   那个小圆点是独立元素（有固定宽高），不受影响。 */
+#dsh-live2d-pet .dshp-head {
+  font-size: 0 !important;
+  margin-bottom: 7px !important;
+}
+
+#dsh-live2d-pet .dshp-head::after {
+  content: '小鲸鱼';
+  font-size: clamp(13px, 0.95vw, 18px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--dshp-accent);
+}
+
+#dsh-live2d-pet .dshp-bubble .dshp-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* ——————————————————————————————————————————
+   猜词游戏层
+   —————————————————————————————————————————— */
+#game {
+  position: fixed;
+  inset: 0;
+  /* pet.js 把画布顶到 2147483000，游戏层必须比它还高，否则词板和选项会被画布里的桌子挡住 */
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+#game.on {
+  opacity: 1;
+}
+
+/* 词板：举在她身后，微微摇摆 */
+.game-card {
+  position: absolute;
+  left: 17%;
+  top: 15%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: clamp(150px, 13vw, 210px);
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  background: linear-gradient(165deg, #ffffff 0%, #eef6ff 55%, #dcebff 100%);
+  border: 2px solid rgba(120, 180, 235, 0.65);
+  box-shadow: 0 16px 44px rgba(96, 148, 205, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: card-sway 3.6s ease-in-out infinite;
+}
+
+@keyframes card-sway {
+  0%, 100% { transform: translateX(-50%) rotate(-3deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+}
+
+.game-card-face {
+  font-size: clamp(40px, 5vw, 76px);
+  font-weight: 800;
+  color: #3d8ce0;
+  text-shadow: 0 2px 10px rgba(120, 180, 235, 0.35);
+}
+
+#game.revealed .game-card-face {
+  color: #e08a2e;
+  animation: pop-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes pop-in {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.game-card-meta {
+  font-size: clamp(13px, 1.1vw, 17px);
+  color: rgba(45, 78, 120, 0.8);
+  letter-spacing: 0.06em;
+}
+
+/* 当前提示 */
+.game-hint {
+  position: absolute;
+  left: 17%;
+  top: 62%;
+  max-width: 26vw;
+  transform: translateX(-50%);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(120, 180, 235, 0.45);
+  color: #1b2a44;
+  box-shadow: 0 8px 24px rgba(120, 160, 210, 0.22);
+  font-size: clamp(16px, 1.5vw, 24px);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.game-hint:not(:empty) {
+  opacity: 1;
+}
+
+/* 倒计时 */
+.game-bar {
+  position: absolute;
+  left: 17%;
+  top: 68%;
+  transform: translateX(-50%);
+  width: min(22vw, 320px);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(120, 180, 235, 0.18);
+  overflow: hidden;
+}
+
+.game-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #7cc4f5, #4f8fe0);
+  transition: width 0.12s linear;
+}
+
+/* 四个选项 */
+.game-options {
+  position: absolute;
+  left: 50%;
+  bottom: 3%;
+  padding: 12px;
+  border-radius: 22px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.62));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(120, 160, 210, 0.18);
+  transform: translateX(-50%);
+  display: grid;
+  /* 选题阶段 3 张、回答阶段 4 张，自动铺满不留空档 */
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 14px;
+  width: min(88vw, 1360px);
+}
+
+.game-opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(120, 180, 235, 0.55);
+  color: #1b2a44;
+  box-shadow: 0 8px 22px rgba(120, 160, 210, 0.18);
+  font-size: clamp(18px, 1.7vw, 28px);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.game-opt .k {
+  color: #3d8ce0;
+  font-weight: 800;
+}
+
+.game-opt .t {
+  flex: 1;
+}
+
+.game-opt .n {
+  min-width: 1.4em;
+  text-align: right;
+  color: #e08a2e;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8em;
+}
+
+.game-opt.correct {
+  background: linear-gradient(135deg, #d9f7ec, #ffffff);
+  border-color: #35b98a;
+  box-shadow: 0 0 0 2px rgba(53, 185, 138, 0.25), 0 10px 26px rgba(53, 185, 138, 0.22);
+}
+
+.game-opt.pulse {
+  transform: scale(1.05);
+  background: rgba(124, 160, 235, 0.35);
+}
+
+.game-result {
+  position: absolute;
+  left: 50%;
+  bottom: 13.5%;
+  transform: translateX(-50%);
+  font-size: clamp(15px, 1.3vw, 21px);
+  color: #2b5c96;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+}
+.game-opt.dim { opacity: 0.45; }
+
+.game-card-face.word {
+  font-size: clamp(26px, 2.6vw, 46px);
+  letter-spacing: 0.08em;
+  color: #2b5c96;
+  text-shadow: 0 2px 12px rgba(120, 180, 235, 0.4);
+}
+
+/* 游戏期间把弹幕流水让开，别压在选项上 */
+body.gaming #feed {
+  opacity: 0.12;
+  transition: opacity 0.3s ease;
+}
+
+/* ——————————————————————————————————————————
+   可选背景：?bg=gradient
+   OBS 默认用透明，需要背景时再加这个参数
+   —————————————————————————————————————————— */
+body.bg-gradient {
+  background:
+    radial-gradient(1200px 700px at 18% 12%, #eaf6ff 0%, rgba(234, 246, 255, 0) 62%),
+    radial-gradient(1000px 620px at 86% 4%, #f3ecff 0%, rgba(243, 236, 255, 0) 58%),
+    radial-gradient(900px 700px at 72% 92%, #e6fbf4 0%, rgba(230, 251, 244, 0) 60%),
+    linear-gradient(178deg, #ffffff 0%, #f7fbff 46%, #eef6ff 100%);
+}
+
+body.bg-gradient::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 30%, rgba(150, 205, 250, 0.28) 0 6px, transparent 7px),
+    radial-gradient(circle at 28% 68%, rgba(150, 205, 250, 0.22) 0 10px, transparent 11px),
+    radial-gradient(circle at 62% 22%, rgba(170, 160, 255, 0.2) 0 8px, transparent 9px),
+    radial-gradient(circle at 78% 62%, rgba(150, 205, 250, 0.24) 0 5px, transparent 6px),
+    radial-gradient(circle at 44% 86%, rgba(120, 220, 200, 0.2) 0 7px, transparent 8px);
+  background-size: 520px 520px, 680px 680px, 560px 560px, 760px 760px, 620px 620px;
+  animation: bubble-drift 26s linear infinite;
+}
+
+@keyframes bubble-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -520px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-gradient::before { animation: none; }
+}
+
+/* 开场常驻说明：没在玩的时候告诉观众怎么触发 */
+#idle-tip {
+  position: fixed;
+  left: 17%;
+  top: 48%;
+  transform: translateX(-50%);
+  max-width: 33vw;
+  padding: 18px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(120, 180, 235, 0.6);
+  box-shadow: 0 14px 36px rgba(120, 160, 210, 0.25);
+  color: #1b2a44;
+  font-size: clamp(14px, 1.15vw, 18px);
+  line-height: 1.65;
+  text-align: left;
+  white-space: pre-line;
+  z-index: 2147483647;
+  transition: opacity 0.3s ease;
+}
+
+#idle-tip.hidden { opacity: 0; }
+
+/* 词板下面那条规则 */
+.game-rule {
+  position: absolute;
+  left: 17%;
+  top: 46%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 31vw;
+  padding: 9px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px dashed rgba(120, 180, 235, 0.7);
+  color: #2b5c96;
+  font-size: clamp(12px, 1vw, 15px);
+  line-height: 1.5;
+  text-align: left;
+  white-space: pre-line;
+}
+
+/* 开场那一瞬间：词板放大一点、加个光圈，告诉观众"开始了" */
+#game.starting .game-card {
+  transform: translateX(-50%) scale(1.08);
+  animation: card-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+  box-shadow: 0 0 0 4px rgba(124, 196, 245, 0.35), 0 20px 50px rgba(96, 148, 205, 0.35);
+}
+
+@keyframes card-pop {
+  from { transform: translateX(-50%) scale(0.82); opacity: 0.4; }
+  to   { transform: translateX(-50%) scale(1.08); opacity: 1; }
+}
+
+#game.starting .game-hint {
+  font-size: clamp(18px, 1.6vw, 26px);
+  font-weight: 600;
+  color: #2b5c96;
+}

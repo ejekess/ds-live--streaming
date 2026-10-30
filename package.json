@@ -1,0 +1,24 @@
+{
+  "name": "douyin-whale-live",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "抖音直播虚拟形象插件：鲸鱼娘 Live2D 上播，读弹幕挑互动，按打赏档位演出对应行为（OBS 浏览器源）。",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "node --watch src/index.mjs",
+    "patch:pet": "node tools/patch-pet.mjs",
+    "verify": "node tools/verify.mjs",
+    "demo": "node tools/demo.mjs"
+  },
+  "dependencies": {
+    "protobufjs": "^7.4.0",
+    "ws": "^8.18.0"
+  },
+  "optionalDependencies": {
+    "playwright-core": "^1.48.0"
+  }
+}

@@ -1,0 +1,30 @@
+node_modules/
+.uv-cache/
+.venv/
+.npm-cache/
+data/browser-profile/
+data/runtime/
+logs/
+*.log
+
+# 解包出来的上游参考源码（第三方许可，不入库）
+vendor/_downloads/
+vendor/_reference/
+
+# 打补丁生成的文件（由 tools/patch-pet.mjs 重建）
+vendor/whale-girl/assets/pet.patched.js
+
+.env
+
+# 运行时产物
+data/pylibs/
+data/stats.json
+data/voice/cache/
+data/songs/rendered/
+data/songs/covers/
+*.mp3
+*.wav
+*.m4a
+data/songs/index.json
+data/songs/queue.json
+data/songs/quota.json

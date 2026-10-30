@@ -1,0 +1,173 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8787,
+    "adminToken": ""
+  },
+  "source": {
+    "kind": "mock",
+    "replay": {
+      "file": "data/sample-live.jsonl",
+      "speed": 1,
+      "loop": false
+    },
+    "exec": {
+      "command": "",
+      "args": [],
+      "cwd": ""
+    },
+    "cdp": {
+      "roomUrl": "",
+      "browserChannel": "msedge",
+      "headless": false,
+      "userDataDir": "data/browser-profile",
+      "warmupMs": 6000
+    }
+  },
+  "avatar": {
+    "height": 820,
+    "corner": "br",
+    "lookAtCursor": false,
+    "talkMouth": true,
+    "bubbleTtlMs": 0,
+    "maxWidthRatio": 0.9
+  },
+  "reaction": {
+    "cooldownMs": 800,
+    "maxPerMinute": 45,
+    "comboWindowMs": 4500,
+    "announceComboAt": [
+      3,
+      10,
+      52,
+      1314
+    ],
+    "tierCooldownMs": {
+      "1": 2600,
+      "2": 1800,
+      "3": 900,
+      "4": 350,
+      "5": 0
+    }
+  },
+  "interaction": {
+    "enabled": true,
+    "minIntervalMs": 7000,
+    "maxPerMinute": 5,
+    "pickWindowMs": 2200,
+    "minScore": 7,
+    "ignore": {
+      "maxLength": 60,
+      "patterns": [
+        "加微",
+        "加v",
+        "代刷",
+        "卖号",
+        "返利",
+        "兼职"
+      ]
+    },
+    "greetEnter": false
+  },
+  "brain": {
+    "kind": "llm",
+    "persona": {
+      "name": "小鲸鱼",
+      "tone": [
+        "呀",
+        "呢",
+        "哦",
+        "啦"
+      ]
+    },
+    "llm": {
+      "enabled": true,
+      "endpoint": "https://api.deepseek.com/chat/completions",
+      "model": "deepseek-chat",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "timeoutMs": 6000,
+      "maxOutputChars": 42,
+      "maxCallsPerMinute": 15,
+      "maxCallsPerDay": 600,
+      "includeHistory": false
+    }
+  },
+  "voice": {
+    "enabled": true,
+    "python": "python",
+    "pythonPath": "data/pylibs",
+    "voice": "zh-CN-XiaoyiNeural",
+    "pitch": "+12Hz",
+    "rate": "-20%",
+    "clipsDir": "D:/space/deepseek/qq-bridge/audio",
+    "cacheDir": "data/voice/cache",
+    "preferClips": true,
+    "duckRatio": 0.3,
+    "maxLen": 60
+  },
+  "songs": {
+    "enabled": false,
+    "libraryDir": "data/songs/covers",
+    "stateDir": "data/songs",
+    "queueFile": "data/songs/queue.json",
+    "quotaFile": "data/songs/quota.json",
+    "renderedDir": "data/songs/rendered",
+    "renderer": "placeholder",
+    "renderTimeoutMs": 600000,
+    "maxQueue": 5,
+    "minGapMs": 90000,
+    "gapAfterAnnounceMs": 1500,
+    "randomAvoidLast": 3,
+    "creditTtlMs": 300000,
+    "grantWindowMs": 10000,
+    "dailyLimit": {
+      "3": 3,
+      "4": 8,
+      "5": 0
+    },
+    "maxSongLen": 20,
+    "blacklist": [],
+    "homophoneRules": [],
+    "singMotion": "aidale",
+    "rebuildIndex": false,
+    "rvc": {
+      "python": "python",
+      "script": "D:/space/deepseek/qq-bridge/tools/sing.py",
+      "cwd": "D:/space/deepseek/qq-bridge",
+      "env": {}
+    },
+    "placeholder": {
+      "delayMs": 8000,
+      "seconds": 6
+    }
+  },
+  "games": {
+    "enabled": true,
+    "mode": "reverse",
+    "triggerGifts": [],
+    "minTier": 4,
+    "cooldownMs": 120000,
+    "hintCount": 3,
+    "phases": {
+      "introMs": 4000,
+      "hintGapMs": 12000,
+      "optionsMs": 45000,
+      "revealMs": 8000,
+      "pickMs": 6000,
+      "askMs": 3000,
+      "answerMs": 8000,
+      "rounds": 5,
+      "decideTimeoutMs": 6000,
+      "maxGuesses": 3,
+      "startMs": 3500
+    },
+    "reverse": {
+      "demoGuess": false
+    },
+    "idleTip": "🐳 猜词小游戏\n她不知道答案 —— 答案在你们手里。\n\n🎁 送一个「小心心」就能开一局\n① 发 1 / 2 / 3  选她想问的问题\n② 发 1-4  回答，0 = 不确定\n③ 她根据你们的回答猜词"
+  },
+  "gifts": {
+    "catalog": "config/gifts.json",
+    "overrides": {}
+  }
+}

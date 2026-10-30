@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>鲸鱼娘 · 直播舞台</title>
+    <link rel="stylesheet" href="/stage/stage.css" />
+  </head>
+  <body>
+    <!-- 背景透明：OBS 浏览器源直接叠在场景上 -->
+    <div id="fx"><canvas id="fx-canvas"></canvas></div>
+    <div id="feed" aria-hidden="true"></div>
+    <div id="banner" aria-hidden="true"></div>
+    <div id="fallback-sub" aria-hidden="true"></div>
+    <!-- 猜词游戏层：词板 + 选项 + 倒计时 -->
+    <!-- 没在玩游戏时的常驻说明：送什么礼物 → 能玩什么 -->
+    <div id="idle-tip"></div>
+
+    <div id="game" aria-hidden="true">
+      <div class="game-card">
+        <div class="game-card-face">?</div>
+        <div class="game-card-meta"></div>
+      </div>
+      <div class="game-rule"></div>
+      <div class="game-hint"></div>
+      <div class="game-bar"><i></i></div>
+      <div class="game-options"></div>
+      <div class="game-result"></div>
+    </div>
+
+    <div id="hint" aria-hidden="true">等待直播事件…</div>
+
+    <script type="module" src="/stage/stage.js"></script>
+  </body>
+</html>

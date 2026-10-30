@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>鲸鱼娘直播 · 管控台</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <span class="logo">🐳</span>
+        <div>
+          <h1>鲸鱼娘直播管控台</h1>
+          <p id="subtitle">正在连接…</p>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="live">现场</button>
+      <button class="tab" data-tab="test">手动测试</button>
+      <button class="tab" data-tab="settings">设置</button>
+      <button class="tab" data-tab="logs">日志</button>
+      <span class="spacer"></span>
+      <a class="link" href="/avatar" target="_blank" rel="noreferrer">打开舞台页 ↗</a>
+    </nav>
+
+    <main>
+      <!-- 现场 -->
+      <section class="pane active" data-pane="live">
+        <div class="cols">
+          <div class="card">
+            <h2>事件流</h2>
+            <div class="stream" id="stream"></div>
+          </div>
+          <div class="side">
+            <div class="card">
+              <h2>最近演出</h2>
+              <div class="kv" id="lastPerf"><span class="muted">还没有演出</span></div>
+            </div>
+            <div class="card">
+              <h2>最近回复</h2>
+              <div class="kv" id="lastReply"><span class="muted">还没有回复</span></div>
+            </div>
+            <div class="card">
+              <h2>队列</h2>
+              <div class="kv" id="queue"><span class="muted">—</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 手动测试 -->
+      <section class="pane" data-pane="test">
+        <div class="card">
+          <h2>打赏档位</h2>
+          <p class="hint">点一下就等于观众送了对应档位的礼物，用来验证「打赏 → 动作 / 表情 / 特效」有没有接对。</p>
+          <div class="row" id="tierBtns"></div>
+        </div>
+        <div class="card">
+          <h2>让她说一句</h2>
+          <p class="hint">走的是和真实互动同一条链路（气泡 + 口型），不是硬塞文本。
+            <b>注意：这里只是让她把这句话念出来，不会触发点歌</b>——点歌请用下面的「点歌」面板。</p>
+          <div class="row">
+            <input id="sayInput" type="text" maxlength="40" placeholder="例如：大家好，我是小鲸鱼" />
+            <button class="btn primary" id="sayBtn">说出来</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>猜词小游戏</h2>
+          <p class="hint">送 T4 以上礼物会自动开局。这里可以手动开一局，或提前结束。</p>
+          <div class="row">
+            <button class="btn primary" id="gameBtn">开一局</button>
+            <button class="btn" id="gameStopBtn">结束本局</button>
+            <span class="kv-inline" id="gameStatus">—</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>点歌</h2>
+          <p class="hint">
+            打赏 T3 起才有券。这里点歌会自动发一张测试券，用来验证「门禁 → 队列 → 渲染 → 报幕 → 播放」整条链路。
+            歌名留空就是从曲库随机。
+          </p>
+          <div class="row">
+            <input id="songInput" type="text" maxlength="20" placeholder="歌名（留空=随机）" />
+            <select id="songTier">
+              <option value="3">T3 挺大方</option>
+              <option value="4" selected>T4 大礼</option>
+              <option value="5">T5 重礼</option>
+            </select>
+            <button class="btn primary" id="songBtn">点歌</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="songStopBtn">停止播放</button>
+            <button class="btn" id="songClearBtn">清空队列</button>
+            <span class="kv-inline" id="songStatus">—</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>动作 / 特效</h2>
+          <div class="row" id="motionBtns"></div>
+          <div class="row" id="effectBtns"></div>
+          <div class="row">
+            <button class="btn" id="resetBtn">复位状态</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>弹幕源</h2>
+          <div class="row">
+            <button class="btn" id="srcStop">暂停接收</button>
+            <button class="btn" id="srcStart">继续接收</button>
+            <span class="kv-inline" id="srcStatus"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 设置 -->
+      <section class="pane" data-pane="stats">
+        <div class="card">
+          <h2>今天的账 <span class="kv-inline" id="statsDate">—</span></h2>
+          <div class="row"><button class="btn" id="statsRefresh">刷新</button><span class="kv-inline" id="statsUpdated"></span></div>
+          <div id="statsSummary"></div>
+        </div>
+        <div class="card">
+          <h2>礼物排行</h2>
+          <div id="statsGifts"></div>
+        </div>
+        <div class="card">
+          <h2>送礼排行</h2>
+          <div id="statsUsers"></div>
+        </div>
+        <div class="card">
+          <h2>近 14 天</h2>
+          <div id="statsHistory"></div>
+        </div>
+      </section>
+
+      <section class="pane" data-pane="settings">
+        <div class="card">
+          <h2>互动</h2>
+          <label class="field">
+            <span>启用主动搭话</span>
+            <input type="checkbox" data-cfg="interaction.enabled" />
+          </label>
+          <label class="field">
+            <span>两次搭话最小间隔（毫秒）</span>
+            <input type="number" data-cfg="interaction.minIntervalMs" min="1000" step="500" />
+          </label>
+          <label class="field">
+            <span>每分钟最多搭话（条）</span>
+            <input type="number" data-cfg="interaction.maxPerMinute" min="1" max="30" />
+          </label>
+          <label class="field">
+            <span>挑弹幕的分数线（越高越挑剔）</span>
+            <input type="number" data-cfg="interaction.minScore" min="0" max="20" step="0.5" />
+          </label>
+          <label class="field">
+            <span>欢迎新进场的观众</span>
+            <input type="checkbox" data-cfg="interaction.greetEnter" />
+          </label>
+        </div>
+        <div class="card">
+          <h2>演出节奏</h2>
+          <label class="field">
+            <span>两次演出最小间隔（毫秒）</span>
+            <input type="number" data-cfg="reaction.cooldownMs" min="0" step="100" />
+          </label>
+          <label class="field">
+            <span>每分钟最多演出（次）</span>
+            <input type="number" data-cfg="reaction.maxPerMinute" min="1" max="120" />
+          </label>
+          <label class="field">
+            <span>连击合并窗口（毫秒）</span>
+            <input type="number" data-cfg="reaction.comboWindowMs" min="500" step="500" />
+          </label>
+        </div>
+        <div class="card">
+          <h2>大脑</h2>
+          <p class="hint">
+            规则脑不联网、不花钱。切到 LLM 只影响「被挑中的那一条」，且受每分钟/每天调用上限、输出长度、超时三重约束；
+            调用失败自动退回规则脑。
+          </p>
+          <label class="field">
+            <span>模式</span>
+            <select data-cfg="brain.kind">
+              <option value="rules">规则（默认，零成本）</option>
+              <option value="llm">大模型（需配置 API Key）</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>启用 LLM 调用</span>
+            <input type="checkbox" data-cfg="brain.llm.enabled" />
+          </label>
+          <label class="field">
+            <span>每分钟调用上限</span>
+            <input type="number" data-cfg="brain.llm.maxCallsPerMinute" min="0" max="60" />
+          </label>
+          <label class="field">
+            <span>每天调用上限</span>
+            <input type="number" data-cfg="brain.llm.maxCallsPerDay" min="0" max="5000" step="10" />
+          </label>
+          <div class="row">
+            <button class="btn primary" id="saveCfg">保存设置</button>
+            <span class="kv-inline" id="cfgStatus"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 日志 -->
+      <section class="pane" data-pane="logs">
+        <div class="card">
+          <div class="row between">
+            <h2>运行日志</h2>
+            <button class="btn" id="clearLogs">清屏</button>
+          </div>
+          <pre class="logs" id="logs"></pre>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/admin/admin.js"></script>
+  </body>
+</html>
