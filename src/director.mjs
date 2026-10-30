@@ -698,7 +698,7 @@ export class Director {
     }
     if (kind === 'game') {
       if (payload.action === 'stop') return this.#game.stop();
-      const r = this.#game.start({ trigger: 'manual' });
+      const r = this.#game.start({ trigger: 'manual', giver: payload.giver ?? null });
       // 注意：不返回 word——揭晓前答案不该出现在管控台/接口里
       return r.ok ? { ok: true, mode: r.mode, category: r.category, length: r.length ?? (r.word ? Array.from(r.word).length : null) } : { ok: false, reason: r.reason };
     }

@@ -148,6 +148,7 @@ export function createAnyGameService({ cfg = {}, clock, random, hooks = {} } = {
       clock,
       random,
       hooks: {
+        onStart: hooks.onRevStart,
         onPick: hooks.onRevPick,
         onAsk: hooks.onRevAsk,
         onAnswer: hooks.onRevAnswer,

@@ -5,7 +5,7 @@
     "adminToken": ""
   },
   "source": {
-    "kind": "mock",
+    "kind": "cdp",
     "replay": {
       "file": "data/sample-live.jsonl",
       "speed": 1,
@@ -17,7 +17,7 @@
       "cwd": ""
     },
     "cdp": {
-      "roomUrl": "",
+      "roomUrl": "https://live.douyin.com/852283141899",
       "browserChannel": "msedge",
       "headless": false,
       "userDataDir": "data/browser-profile",
@@ -55,7 +55,7 @@
     "minIntervalMs": 7000,
     "maxPerMinute": 5,
     "pickWindowMs": 2200,
-    "minScore": 7,
+    "minScore": 0,
     "ignore": {
       "maxLength": 60,
       "patterns": [
@@ -145,21 +145,17 @@
     "enabled": true,
     "mode": "reverse",
     "triggerGifts": [],
-    "minTier": 4,
-    "cooldownMs": 120000,
+    "minTier": 1,
+    "cooldownMs": 500,
     "hintCount": 3,
     "phases": {
-      "introMs": 4000,
-      "hintGapMs": 12000,
-      "optionsMs": 45000,
-      "revealMs": 8000,
-      "pickMs": 6000,
+      "startMs": 7000,
+      "pickMs": 7000,
       "askMs": 3000,
-      "answerMs": 8000,
-      "rounds": 5,
-      "decideTimeoutMs": 6000,
-      "maxGuesses": 3,
-      "startMs": 3500
+      "answerMs": 9000,
+      "revealMs": 9000,
+      "rounds": 3,
+      "decideTimeoutMs": 6000
     },
     "reverse": {
       "demoGuess": false
