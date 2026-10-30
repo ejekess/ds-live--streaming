@@ -5,7 +5,7 @@
     "adminToken": ""
   },
   "source": {
-    "kind": "cdp",
+    "kind": "mock",
     "replay": {
       "file": "data/sample-live.jsonl",
       "speed": 1,
@@ -17,7 +17,7 @@
       "cwd": ""
     },
     "cdp": {
-      "roomUrl": "https://live.douyin.com/852283141899",
+      "roomUrl": "",
       "browserChannel": "msedge",
       "headless": false,
       "userDataDir": "data/browser-profile",
@@ -55,7 +55,7 @@
     "minIntervalMs": 7000,
     "maxPerMinute": 5,
     "pickWindowMs": 2200,
-    "minScore": 0,
+    "minScore": 7,
     "ignore": {
       "maxLength": 60,
       "patterns": [
@@ -145,8 +145,8 @@
     "enabled": true,
     "mode": "reverse",
     "triggerGifts": [],
-    "minTier": 1,
-    "cooldownMs": 500,
+    "minTier": 4,
+    "cooldownMs": 120000,
     "hintCount": 3,
     "phases": {
       "startMs": 7000,
@@ -160,7 +160,7 @@
     "reverse": {
       "demoGuess": false
     },
-    "idleTip": "🐳 猜词小游戏\n她不知道答案 —— 答案在你们手里。\n\n🎁 送一个「小心心」就能开一局\n① 发 1 / 2 / 3  选她想问的问题\n② 发 1-4  回答，0 = 不确定\n③ 她根据你们的回答猜词"
+    "idleTip": "🐳 猜词小游戏\n她不知道答案 —— 答案在你们手里。\n\n🎁 送一个「小心心」就能开一局\n① 发 1 / 2 / 3  选她想问的问题\n② 发 1-4  回答，0 = 不确定\n③ 她根据你们的回答猜词"
   },
   "gifts": {
     "catalog": "config/gifts.json",
