@@ -28,3 +28,6 @@ data/songs/covers/
 data/songs/index.json
 data/songs/queue.json
 data/songs/quota.json
+
+# 打包产物
+*.zip
